@@ -11,7 +11,29 @@
 	<artifactId>perfectomobile-jenkins</artifactId>
 	<version>1.0-SNAPSHOT</version>
 	<packaging>hpi</packaging>
-	<name>Perfecto Mobile Jenkins  Plugin</name>
+	<name>Perfecto Mobile Jenkins Plugin</name>
+	<url>https://wiki.jenkins-ci.org/display/JENKINS/MobileCloud</url>
+
+	<distributionManagement>
+		<repository>
+			<id>maven.jenkins-ci.org</id>
+			<url>http://maven.jenkins-ci.org/content/repositories/releases/</url>
+		</repository>
+	</distributionManagement>
+
+	<developers>
+		<developer>
+			<id>guymi</id>
+			<name>Guy Michaelis</name>
+			<email>guy@tikalk.com</email>
+		</developer>
+	</developers>
+
+	<scm>
+		<connection>scm:git:git://github.com:jenkinsci/MobileCloud.git</connection>
+		<developerConnection>scm:git:git@github.com:jenkinsci/MobileCloud.git</developerConnection>
+		<url>https://github.com/jenkinsci/MobileCloud.git</url>
+	</scm>
 
 	<!-- get every artifact through repo.jenkins-ci.org, which proxies all the 
 		artifacts that we need -->
