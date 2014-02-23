@@ -46,7 +46,7 @@
       	<j:set var="id" value="${descriptor.getRandomID()}" />
       	<input type="hidden" name="id" value="${id}" />
          <input type="button" id="refreshParametersHidden" onClick="refreshParameters(param${id})" value="Parameters List" />
-         <f:entry title="Script Parameters" field="scriptParams" description="Parameters required by PM script">
+         <f:entry title="Script Parameters" field="scriptParams" >
 			  <f:textarea id="param${id}"/>
 	     </f:entry>	
       </div>
