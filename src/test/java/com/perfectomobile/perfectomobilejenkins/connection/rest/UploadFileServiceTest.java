@@ -17,7 +17,7 @@ public class UploadFileServiceTest {
 	public void testuploadFile() throws FileNotFoundException, ParseException{
 		
 		HttpResponse perfectoResponse = null;
-		File fileName = new File("src/test/resources/photo2.JPG");
+		File fileName = new File("src/test/resources/photo.JPG");
 		
 		try {
 			perfectoResponse = HttpServices.getInstance().uploadFile(
