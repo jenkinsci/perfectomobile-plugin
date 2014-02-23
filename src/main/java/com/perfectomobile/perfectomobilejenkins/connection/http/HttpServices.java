@@ -4,7 +4,6 @@ import hudson.ProxyConfiguration;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URI;
@@ -19,7 +18,6 @@ import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpPost;
@@ -143,30 +141,25 @@ public class HttpServices {
 	    setProxy(httpPost);
 
 	    InputStreamEntity reqEntity = null;
+	    HttpResponse response = null;
 	    
 		try {
 			reqEntity = new InputStreamEntity(
 			        new FileInputStream(file), -1);
 			
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-	    reqEntity.setContentType("binary/octet-stream");
-	    reqEntity.setChunked(true); // Send in multiple parts if needed
-	    httpPost.setEntity(reqEntity);
-	    HttpResponse response = null;
-	    
-	    try {
-			response = httpClient.execute(httpPost);
-		} catch (ClientProtocolException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+			reqEntity.setContentType("binary/octet-stream");
+		    reqEntity.setChunked(true); // Send in multiple parts if needed
+		    httpPost.setEntity(reqEntity);
+		    
+		    response = httpClient.execute(httpPost);
+			
+		} catch (Exception e) {
+			logger.println(e.toString());
 		} finally {
             httpClient.close();
         }
 	    
-	    return response;
+		return response;
 	}
 
 }

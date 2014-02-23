@@ -1,15 +1,17 @@
 package com.perfectomobile.perfectomobilejenkins.service;
 
+import hudson.EnvVars;
+import hudson.console.HyperlinkNote;
+import hudson.model.BuildListener;
+import hudson.model.AbstractBuild;
+
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
-
-import javax.servlet.ServletException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpResponse;
@@ -18,19 +20,13 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import hudson.EnvVars;
-import hudson.console.HyperlinkNote;
-import hudson.model.AbstractBuild;
-import hudson.model.BuildListener;
-import hudson.util.Secret;
-
+import com.perfectomobile.perfectomobilejenkins.Constants;
+import com.perfectomobile.perfectomobilejenkins.PerfectoMobileBuilder.DescriptorImpl;
 import com.perfectomobile.perfectomobilejenkins.connection.http.HttpServices;
 import com.perfectomobile.perfectomobilejenkins.connection.rest.RestServices;
 import com.perfectomobile.perfectomobilejenkins.entities.UploadFile;
 import com.perfectomobile.perfectomobilejenkins.parser.json.JsonParser;
 import com.perfectomobile.perfectomobilejenkins.parser.xml.XmlParser;
-import com.perfectomobile.perfectomobilejenkins.Constants;
-import com.perfectomobile.perfectomobilejenkins.PerfectoMobileBuilder.DescriptorImpl;
 import com.sun.jersey.api.client.ClientResponse;
 
 /**
@@ -165,13 +161,7 @@ public class PMExecutionServices {
 							descriptor.getAccessId(),
 							descriptor.getSecretKey(),
 							reportKey);
-		} catch (IOException e) {
-			listener.getLogger().println(e.toString());
-			return null;
-		} catch (ServletException e) {
-			listener.getLogger().println(e.toString());
-			return null;
-		} catch (ParseException e) {
+		} catch (Exception e) {
 			listener.getLogger().println(e.toString());
 			return null;
 		}
@@ -183,10 +173,7 @@ public class PMExecutionServices {
 			EnvVars envVars = new EnvVars();
 			try {
 				envVars = build.getEnvironment(listener);
-			} catch (IOException e) {
-				listener.getLogger().println(e.toString());
-				return null;
-			} catch (InterruptedException e) {
+			} catch (Exception e) {
 				listener.getLogger().println(e.toString());
 				return null;
 			}
@@ -296,10 +283,8 @@ public class PMExecutionServices {
 							uploadFile.getRepository(),
 							uploadFile.getRepositoryItemKey(),
 							new File(uploadFile.getFilePath()));
-				} catch (URISyntaxException e) {
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
+				} catch (Exception e) {
+					listener.getLogger().println(e.toString());
 				}
 			}
 		}

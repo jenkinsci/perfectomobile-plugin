@@ -1,13 +1,14 @@
 package com.perfectomobile.perfectomobilejenkins.connection.rest;
 
-import hudson.ProxyConfiguration;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.StringTokenizer;
+
 import javax.servlet.ServletException;
 import javax.ws.rs.core.MultivaluedMap;
-import jenkins.model.Jenkins;
+
 import org.apache.commons.httpclient.auth.AuthScope;
+
 import com.perfectomobile.perfectomobilejenkins.Constants;
 import com.perfectomobile.perfectomobilejenkins.connection.Proxy;
 import com.sun.jersey.api.client.Client;
