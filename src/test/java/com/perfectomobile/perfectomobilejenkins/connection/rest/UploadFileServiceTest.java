@@ -17,7 +17,7 @@ public class UploadFileServiceTest {
 	public void testuploadFile() throws FileNotFoundException, ParseException{
 		
 		HttpResponse perfectoResponse = null;
-		File fileName = new File("src/test/resources/photo.JPG");
+		File fileName = new File("src/test/resources/photo2.JPG");
 		
 		try {
 			perfectoResponse = HttpServices.getInstance().uploadFile(
@@ -27,10 +27,8 @@ public class UploadFileServiceTest {
 					"media", 
 					"PRIVATE:/pictures/pic22.png",
 					fileName);
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace(System.out);
 		}
 	}
 }

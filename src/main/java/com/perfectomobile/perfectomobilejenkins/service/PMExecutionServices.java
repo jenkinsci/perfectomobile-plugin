@@ -162,7 +162,7 @@ public class PMExecutionServices {
 							descriptor.getSecretKey(),
 							reportKey);
 		} catch (Exception e) {
-			listener.getLogger().println(e.toString());
+			e.printStackTrace(listener.getLogger());
 			return null;
 		}
 
@@ -174,7 +174,7 @@ public class PMExecutionServices {
 			try {
 				envVars = build.getEnvironment(listener);
 			} catch (Exception e) {
-				listener.getLogger().println(e.toString());
+				e.printStackTrace(listener.getLogger());
 				return null;
 			}
 			
@@ -194,7 +194,7 @@ public class PMExecutionServices {
 			try {
 				FileUtils.moveFile(report, new File(reportName));
 			} catch (IOException e) {
-				listener.getLogger().println(e.toString());
+				e.printStackTrace(listener.getLogger());
 				return null;
 			}
 
@@ -284,7 +284,7 @@ public class PMExecutionServices {
 							uploadFile.getRepositoryItemKey(),
 							new File(uploadFile.getFilePath()));
 				} catch (Exception e) {
-					listener.getLogger().println(e.toString());
+					e.printStackTrace(listener.getLogger());
 				}
 			}
 		}

@@ -154,7 +154,8 @@ public class HttpServices {
 		    response = httpClient.execute(httpPost);
 			
 		} catch (Exception e) {
-			logger.println(e.toString());
+			e.printStackTrace(logger);
+			
 		} finally {
             httpClient.close();
         }

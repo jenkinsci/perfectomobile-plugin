@@ -165,7 +165,7 @@ public class PerfectoMobileBuilder extends Builder {
 			}
 
 		} catch (Exception e) {
-			listener.getLogger().println(e.toString());
+			e.printStackTrace(listener.getLogger());
 		}
 
 		
