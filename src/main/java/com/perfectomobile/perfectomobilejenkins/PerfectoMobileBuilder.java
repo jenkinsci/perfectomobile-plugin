@@ -26,7 +26,6 @@ import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
-import org.json.simple.parser.ParseException;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
@@ -165,14 +164,8 @@ public class PerfectoMobileBuilder extends Builder {
 				listener.getLogger().println("ERROR: " + perfectoResponse.getStatusInfo());
 			}
 
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ServletException e) {
-			e.printStackTrace();
-		} catch (ParseException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace(listener.getLogger());
 		}
 
 		
@@ -267,12 +260,9 @@ public class PerfectoMobileBuilder extends Builder {
 				perfectoResponse = RestServices.getInstance().getHandsets(
 						getUrl(), getAccessId(),
 						getSecretKey());
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (ServletException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
-
 			File resultFile = perfectoResponse.getEntity(File.class);
 			List<String> devices = XmlParser.getInstance().getXmlElements(
 					resultFile, XmlParser.DEVICEID_ELEMENT_NAME);
@@ -393,9 +383,7 @@ public class PerfectoMobileBuilder extends Builder {
 			try {
 				perfectoResponse = RestServices.getInstance().getHandsets(url,
 						accessId, secretKey);
-			} catch (IOException e) {
-				return FormValidation.error(e.getMessage());
-			} catch (ServletException e) {
+			} catch (Exception e) {
 				return FormValidation.error(e.getMessage());
 			}
 
@@ -484,9 +472,7 @@ public class PerfectoMobileBuilder extends Builder {
 							}
 						}
 					}
-				} catch (IOException e) {			
-					e.printStackTrace();
-				} catch (ServletException e) {
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 

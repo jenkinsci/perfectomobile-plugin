@@ -1,14 +1,13 @@
 package com.perfectomobile.perfectomobilejenkins.parser.xml;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 public class XmlParser {
 
@@ -53,11 +52,7 @@ public class XmlParser {
 			for (int i = 0; i < itemEelements.getLength(); i++) {
 				elements.add(itemEelements.item(i).getTextContent());
 			}
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -77,11 +72,7 @@ public class XmlParser {
 		try {
 			DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
 			doc = docBuilder.parse(inputFile);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 

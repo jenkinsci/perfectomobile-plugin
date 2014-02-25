@@ -1,9 +1,6 @@
 package com.perfectomobile.perfectomobilejenkins;
 
 import java.io.File;
-import java.io.IOException;
-
-import javax.servlet.ServletException;
 
 import com.perfectomobile.perfectomobilejenkins.connection.rest.RestServices;
 import com.perfectomobile.perfectomobilejenkins.parser.xml.XmlParser;
@@ -39,9 +36,7 @@ public class PMScripts {
 			try {
 				perfectoResponse = RestServices.getInstance().getRepoScripts(
 						url, accessId, secretKey);
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (ServletException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 

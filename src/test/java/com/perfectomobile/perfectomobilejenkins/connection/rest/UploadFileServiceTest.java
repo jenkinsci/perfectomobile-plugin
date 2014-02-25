@@ -27,10 +27,8 @@ public class UploadFileServiceTest {
 					"media", 
 					"PRIVATE:/pictures/pic22.png",
 					fileName);
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace(System.out);
 		}
 	}
 }
