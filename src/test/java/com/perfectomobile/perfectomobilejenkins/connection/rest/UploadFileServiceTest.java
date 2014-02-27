@@ -1,9 +1,9 @@
 package com.perfectomobile.perfectomobilejenkins.connection.rest;
 
+import hudson.FilePath;
+
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.text.ParseException;
 
 import org.apache.http.HttpResponse;
@@ -17,7 +17,7 @@ public class UploadFileServiceTest {
 	public void testuploadFile() throws FileNotFoundException, ParseException{
 		
 		HttpResponse perfectoResponse = null;
-		File fileName = new File("src/test/resources/photo.JPG");
+		FilePath fileName = new FilePath(new File("src/test/resources/photo.JPG"));
 		
 		try {
 			perfectoResponse = HttpServices.getInstance().uploadFile(
