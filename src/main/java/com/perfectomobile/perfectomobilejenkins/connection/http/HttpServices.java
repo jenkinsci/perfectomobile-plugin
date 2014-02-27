@@ -1,10 +1,10 @@
 package com.perfectomobile.perfectomobilejenkins.connection.http;
 
+import hudson.FilePath;
 import hudson.ProxyConfiguration;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -106,7 +106,7 @@ public class HttpServices {
 			final String secretKey, 
 			final String repository,
 			final @PathParam("repositoryItemKey") String repositoryItemKey,
-			final File fileName) throws URISyntaxException, IOException {
+			final FilePath file) throws URISyntaxException, IOException {
 		
 		
 		String path = "/services/repositories/" + repository + "/" + repositoryItemKey; 
@@ -115,7 +115,7 @@ public class HttpServices {
 			
 		printRequest(uri);
 		
-		HttpResponse response = sendRequest(uri, fileName);
+		HttpResponse response = sendRequest(uri, file);
         
         return response;
 	}
@@ -127,7 +127,7 @@ public class HttpServices {
 	 * @return
 	 * @throws IOException 
 	 */
-	private HttpResponse sendRequest(URI uri, File file) throws IOException{
+	private HttpResponse sendRequest(URI uri, FilePath file) throws IOException{
 		
 		CredentialsProvider credsProvider = new BasicCredentialsProvider();
         credsProvider.setCredentials(
@@ -144,8 +144,7 @@ public class HttpServices {
 	    HttpResponse response = null;
 	    
 		try {
-			reqEntity = new InputStreamEntity(
-			        new FileInputStream(file), -1);
+			reqEntity = new InputStreamEntity(file.read(), -1);
 			
 			reqEntity.setContentType("binary/octet-stream");
 		    reqEntity.setChunked(true); // Send in multiple parts if needed
