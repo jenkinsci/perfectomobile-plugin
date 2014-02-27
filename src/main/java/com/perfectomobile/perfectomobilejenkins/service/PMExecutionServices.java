@@ -1,6 +1,7 @@
 package com.perfectomobile.perfectomobilejenkins.service;
 
 import hudson.EnvVars;
+import hudson.FilePath;
 import hudson.console.HyperlinkNote;
 import hudson.model.BuildListener;
 import hudson.model.AbstractBuild;
@@ -13,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpResponse;
 import org.json.simple.parser.ParseException;
 import org.w3c.dom.Element;
@@ -100,7 +100,6 @@ public class PMExecutionServices {
 		NodeList nodeList = XmlParser.getInstance().getNodeList(inputFile,
 				XmlParser.PARAMETER_ELEMENT_NAME);
 
-
 		// do this the old way, because nodeList is not iterable
 		for (int itr = 0; itr < nodeList.getLength(); itr++) {
 
@@ -137,13 +136,15 @@ public class PMExecutionServices {
 	 * @param jsonExecutionResult
 	 *            PM response in json format
 	 * @return the execution report
+	 * @throws InterruptedException
+	 * @throws IOException
 	 */
-	public static File getExecutionReport(DescriptorImpl descriptor,
+	public static FilePath getExecutionReport(DescriptorImpl descriptor,
 			AbstractBuild build, BuildListener listener,
 			String jsonExecutionResult) {
 
 		String reportKey = null;
-		File report = null;
+		FilePath report = null;
 		ClientResponse perfectoResponse = null;
 
 		try {
@@ -159,8 +160,7 @@ public class PMExecutionServices {
 			perfectoResponse = RestServices.getInstance()
 					.downloadExecutionReport(descriptor.getUrl(),
 							descriptor.getAccessId(),
-							descriptor.getSecretKey(),
-							reportKey);
+							descriptor.getSecretKey(), reportKey);
 		} catch (Exception e) {
 			e.printStackTrace(listener.getLogger());
 			return null;
@@ -168,39 +168,33 @@ public class PMExecutionServices {
 
 		//
 		if (perfectoResponse.getStatus() == Constants.PM_RESPONSE_STATUS_SUCCESS) {
-			report = perfectoResponse.getEntity(File.class);
-			
-			EnvVars envVars = new EnvVars();
 			try {
-				envVars = build.getEnvironment(listener);
+				EnvVars envVars = new EnvVars();
+				try {
+					envVars = build.getEnvironment(listener);
+				} catch (Exception e) {
+					e.printStackTrace(listener.getLogger());
+					return null;
+				}
+				
+				report = new FilePath(perfectoResponse.getEntity(File.class));
+				reportKey = reportKey.replace(":", "_");
+				FilePath reportPath = build.getWorkspace().child(
+						reportKey + ".html");
+				//FilePath reportPath = new FilePath(new File(build.getRootDir().getAbsolutePath())).child(reportKey + ".html");
+					
+				listener.getLogger().println(
+										HyperlinkNote.encodeTo(envVars.get("JOB_URL") + "/ws/" + 
+												reportKey + ".html", 		"Show report"));
+				reportPath.copyFrom(report);
 			} catch (Exception e) {
 				e.printStackTrace(listener.getLogger());
-				return null;
 			}
-			
-			
-			//replace colon with underscore because it is forbiden in windows
-			reportKey = reportKey.replace(":", "_");
-			
-			
-			String reportName = envVars.get("WORKSPACE")
-					+ System.getProperty("file.separator") + reportKey
-					+ ".html";
-			
+
+		} else {
 			listener.getLogger().println(
-					HyperlinkNote.encodeTo(envVars.get("JOB_URL") + "/ws/" + 
-							reportKey + ".html", "Show report"));
-			
-			try {
-				FileUtils.moveFile(report, new File(reportName));
-			} catch (IOException e) {
-				e.printStackTrace(listener.getLogger());
-				return null;
-			}
-
-
-		}else{
-			listener.getLogger().println("WARNING: Can't show report. PM returned status " + perfectoResponse.getStatus());
+					"WARNING: Can't show report. PM returned status "
+							+ perfectoResponse.getStatus());
 		}
 
 		return report;
@@ -224,7 +218,6 @@ public class PMExecutionServices {
 		HttpResponse perfectoResponse = null;
 		List<UploadFile> uploadFiles = new ArrayList<UploadFile>();
 
-		
 		String paramName;
 		String paramValue;
 		String parameTypeWithEndTag;
@@ -234,23 +227,33 @@ public class PMExecutionServices {
 
 		if (!textAreaParameters.trim().isEmpty()) {
 			// Split to lines
-			StringTokenizer stParameters = new StringTokenizer(textAreaParameters, System.getProperty("line.separator"));
+			StringTokenizer stParameters = new StringTokenizer(
+					textAreaParameters, System.getProperty("line.separator"));
 			while (stParameters.hasMoreTokens()) {
 				String parameter = stParameters.nextToken();
 				// Split a line. get the name and the value.
-				StringTokenizer stParamToken = new StringTokenizer(parameter, Constants.PARAM_NAME_VALUE_SEPARATOR);
+				StringTokenizer stParamToken = new StringTokenizer(parameter,
+						Constants.PARAM_NAME_VALUE_SEPARATOR);
 				while (stParamToken.hasMoreTokens()) {
 					String paramWithType = stParamToken.nextToken();
-					StringTokenizer stParamWithType = new StringTokenizer(paramWithType, Constants.PARAM_TYPE_START_TAG);
+					StringTokenizer stParamWithType = new StringTokenizer(
+							paramWithType, Constants.PARAM_TYPE_START_TAG);
 					paramName = stParamWithType.nextToken();
 					parameTypeWithEndTag = stParamWithType.nextToken();
-					parameType = parameTypeWithEndTag.substring(0, parameTypeWithEndTag.length()- Constants.PARAM_TYPE_END_TAG.length());
+					parameType = parameTypeWithEndTag.substring(0,
+							parameTypeWithEndTag.length()
+									- Constants.PARAM_TYPE_END_TAG.length());
 					paramValue = stParamToken.nextToken();
-					if (parameType.equals(Constants.PARAM_TYPE_MEDIA) || parameType.equals(Constants.PARAM_TYPE_DATATABLES)){
-						StringTokenizer stParamValue = new StringTokenizer(paramValue, Constants.PARAM_REPOSITORYKEY_FILEPATH_SEPARATOR);
+					if (parameType.equals(Constants.PARAM_TYPE_MEDIA)
+							|| parameType
+									.equals(Constants.PARAM_TYPE_DATATABLES)) {
+						StringTokenizer stParamValue = new StringTokenizer(
+								paramValue,
+								Constants.PARAM_REPOSITORYKEY_FILEPATH_SEPARATOR);
 						repositoryKey = stParamValue.nextToken();
 						filePath = stParamValue.nextToken();
-						UploadFile uploadFile = new UploadFile(parameType, filePath, repositoryKey);
+						UploadFile uploadFile = new UploadFile(parameType,
+								filePath, repositoryKey);
 						uploadFiles.add(uploadFile);
 					}
 				}
@@ -278,11 +281,13 @@ public class PMExecutionServices {
 					// Call PM to upload the files
 					HttpServices.getInstance().setLogger(listener.getLogger());
 					perfectoResponse = HttpServices.getInstance().uploadFile(
-							descriptor.getUrl(), descriptor.getAccessId(),
+							descriptor.getUrl(),
+							descriptor.getAccessId(),
 							descriptor.getSecretKey(),
 							uploadFile.getRepository(),
 							uploadFile.getRepositoryItemKey(),
-							new File(uploadFile.getFilePath()));
+							build.getWorkspace()
+									.child(uploadFile.getFilePath()));
 				} catch (Exception e) {
 					e.printStackTrace(listener.getLogger());
 				}
