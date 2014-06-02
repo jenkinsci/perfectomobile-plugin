@@ -1,0 +1,19 @@
+<div>
+ <p>Click the Refresh parameters list button to display the runtime parameters defined in the script.<br>
+	Fill in the parameter values as specified below for each type.</p>
+	Note: you can use the <i>"Device and Media parameter value assistance"</i> to get some assistance
+ <p><b>String/integer</b>: simply type them<br>
+ 	For example, "appIdentifier(string)=Perfecto Mobile OSE"</p>
+ <p><b>Device parameter</b>: The value should be the device id of the required device<br>
+    Use the <i>"Device and Media parameter value assistance"</i> to find the id. For example: "DUT(Device)=TA8830NFLG"
+	</p>
+ <p><b>Media/DataTable parameter</b>: Enter the repository key and optionally the workspace location of the file to upload, separated by a semicolon.<br>
+ 	For example, "PRIVATE:myfolder/TestApp.apk;mybuild\TestApp.apk"<br>
+ 	Use the <i>"Device and Media parameter value assistance"</i> to find the repository path.
+ </p>
+ <p><b>How to use the <i>"Device and Media parameter value assistance"</i></b>:<br>
+	<font color="red"></b>NOTICE: It is not recommended to use runtime parameter of type Handset (Device) </b></font>; the specified device may be unavailable at runtime. Instead, use the <i>Select device</i> command within your script to select an available device at runtime. Click <a href="http://help.perfectomobile.com/article/AA-02265" target="_blank">here</a> for more information.<br><br>
+	Device: Scroll and select the required device. Click on <i>"Copy to clipboard"</i> and then copy the id and paste into the parameter. <br>
+ 	Media: Find the repository path by typing the path in the field. Select an item from the list, then use the clipboard to copy/paste the value into the parameter.
+ </p> 
+</div>

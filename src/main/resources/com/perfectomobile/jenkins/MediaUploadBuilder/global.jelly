@@ -1,0 +1,9 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+  <!--
+	This jelly is empty because we already have the global configuration for the script execution 
+	so this must be here to let jenkins know that this class has a descriptor
+	now the descriptor class needs to be able to access the script execution descriptor as well as
+	respond to auto-completion etc' methods that are unique to this builder's config.jelly 
+  -->
+  
+</j:jelly>

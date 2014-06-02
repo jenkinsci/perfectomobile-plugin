@@ -1,0 +1,282 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:p="/lib/hudson/project">
+  <!--
+    This jelly script is used for per-project configuration.
+
+    See global.jelly for a general discussion about jelly script.
+  -->
+<script type="text/javascript">
+
+	HANDSET_TYPE_STR_ETC = "(Device)=";
+	DEVICE_INFO_SEPARATOR = "-";	
+	MEDIA_TYPE_STR_ETC = "(Media)=";
+	DATATABLE_TYPE_STR_ETC = "(DataTable)=";
+	NEWLINE = "\n";
+	REPOSITORY_SEP = ";";
+	DATA_TABLE_EXT = ".xml";
+	UNIX_STYLE_FILE_SEP = "/";
+	WINDOWS_STYLE_FILE_SEP = "\\";
+	
+	IMEI_KEY = 'imei';
+	MEDIA_KEY = 'media';
+	DATA_TABLE_KEY = 'dataTable';
+	LOCAL_FILE_KEY = 'localFile';
+	
+		
+	var mapScriptParamsObj2lastChangesAppliedToIt = {};
+		
+         function refreshParameters(id) {
+         
+                        var form = document.getElementById('refreshParametersHidden').form;
+                        buildFormTree(form);
+                        
+                        var json = form.elements["json"].value;
+                        var target = id;
+                        target.value = 'Getting parameters...';
+                       
+                        new Ajax.Request("descriptorByName/com.perfectomobile.jenkins.ScriptExecutionBuilder/getParameters", {  
+                                parameters: { json: json, id: id.id},
+                                onComplete: function (rsp) {
+
+                                        target.value = rsp.status == 200 ? rsp.responseText
+                                                        : '&lt;a href="" onclick="document.getElementById(\'valerr' +
+                                                        (i = iota++) +
+                                                        '\').style.display=\'block\';return false"&gt;ERROR' +
+                                                        '&lt;/a&gt;' +
+                                                        '&lt;div id="valerr' + i + '" style="display:none"&gt;' +
+                                                        rsp.responseText +
+                                                        '&lt;/div&gt;';
+                                        Behaviour.applySubtree(target);
+                                }
+                        });
+                }
+                	
+	function copyToClipboard(text) {
+ 		window.prompt("Press Ctrl+C to copy to clipboard", text);
+	}
+	function getImeiOf(copImeiButtonPressed) {
+		var stepIndex = findPos(copImeiButtonPressed);
+		return getImei(stepIndex); 
+	}
+	function getImei(stepIndex) {
+		var ret = "";
+		var deviceSel = document.getElementsByName('deviceSelection')[stepIndex];
+		if (deviceSel != null &amp;&amp; deviceSel.options[deviceSel.selectedIndex] != null) {
+			var devText = deviceSel.options[deviceSel.selectedIndex].text;
+			ret = getImeiFromDeviceString(devText);
+		} 		
+		return ret; 	
+	}
+	
+	function getImeiFromDeviceString(device) {
+			var pos = device.lastIndexOf(DEVICE_INFO_SEPARATOR);			
+			return pos &lt; 0 ? device : device.substring(pos + DEVICE_INFO_SEPARATOR.length);
+	}
+	function replaceFirstBlankInWith(lookingFor,source, value,endOfField) {
+		var pos = -1;
+		var start = 0;
+		var result = source;
+		
+		while(start &gt;= 0) {
+			pos = source.indexOf(lookingFor, start);
+			if (pos &gt;= 0) { //found
+				start = pos + lookingFor.length;
+				pos = source.indexOf(endOfField, start);
+				if (pos &lt; 0)
+					pos = params.length;
+				var val = source.substring(start,pos).trim();
+				if (val == "") { //found first blank				
+					result = source.substring(0,start) + value + source.substring(pos);
+					start = -1; //stop the loop 
+				} else
+					start = pos;
+			} else
+				start = -1; //stop the loop			
+		}
+		return result;
+	}
+
+	function endsWith(str, suffix) {
+    	return str.indexOf(suffix, str.length - suffix.length) &gt;= 0;
+	}
+	
+	function replaceFirstBlankLocalFileInWith(source, value) {
+		var pos = -1;
+		var start = 0;
+		var result = source;
+
+		var lookingFor = endsWith(value.toLowerCase(),DATA_TABLE_EXT) 
+			? DATATABLE_TYPE_STR_ETC
+			: MEDIA_TYPE_STR_ETC;
+		
+		while(start &gt;= 0) {
+			pos = source.indexOf(lookingFor, start);
+			//assume pos is first
+			
+			if (pos &gt;= 0) { //found
+				start = pos + lookingFor.length;
+				var semiPos = source.indexOf(REPOSITORY_SEP, start);
+				var eoLine = source.indexOf(NEWLINE, start);
+				if (eoLine &lt; 0)
+					eoLine = params.length;
+				//there are a few possibilities:
+				//1. no semicolon on that line (repository key may or may not be on that line) 
+				//2. semi exists but no local file after it
+				//3. semi exists and local file after it
+				if (semiPos &lt; 0 || semiPos &gt; eoLine) { // 1. no semi on that line
+					result = source.substring(0,eoLine) + REPOSITORY_SEP + value + source.substring(eoLine);
+					start = -1;
+				} else { //semi exists on that line
+					semiPos += REPOSITORY_SEP.length; //now points beyon the semi
+					var val = source.substring(semiPos, eoLine).trim(); //the localFile value
+				
+					if (val == "") { //2. found first blank				
+						result = source.substring(0,semiPos) + value + source.substring(eoLine);
+						start = -1; //stop the loop 
+					} else //3.
+						start = eoLine;
+				}
+			} else
+				start = -1; //stop the loop			
+		} //end of while
+		return result;
+
+	}
+
+	function findPos(element) {
+		var elementName = element.name;
+		var all = document.getElementsByName(elementName);
+		var indexPos = -1;
+		for( var index = 0; all != null &amp;&amp; index &lt; all.length &amp;&amp; indexPos &lt; 0; index++) {
+			if (element == all[index])
+				indexPos = index;				
+		}
+		return indexPos;	
+	}
+	
+	function insertValues(insertButtonPressed) {
+
+		var stepIndex = findPos(insertButtonPressed);
+		
+		var params = document.getElementsByName("_.scriptParams")[stepIndex].value;
+		
+		var lastChanges = mapScriptParamsObj2lastChangesAppliedToIt[insertButtonPressed];
+		if (lastChanges == undefined)
+			lastChanges = {IMEI_KEY: null, MEDIA_KEY: null, DATA_TABLE_KEY: null, LOCAL_FILE_KEY: null };
+		
+		if (params != '') {
+			origParams = params;
+			
+			var devImei = getImei(stepIndex);			
+			if (devImei != "" &amp;&amp; devImei != lastChanges[IMEI_KEY]) {
+				params = replaceFirstBlankInWith(HANDSET_TYPE_STR_ETC,params, devImei, NEWLINE);
+			}
+			lastChanges[IMEI_KEY] = devImei; 
+			
+			var media = document.getElementsByName('_.autoMedia')[stepIndex].value;
+			if (media != "" &amp;&amp; media != lastChanges[MEDIA_KEY]) {
+				params = replaceFirstBlankInWith(MEDIA_TYPE_STR_ETC,params, media,REPOSITORY_SEP);
+			}
+			lastChanges[MEDIA_KEY] = media;
+			
+			var datatable = document.getElementsByName('_.autoDatatable')[stepIndex].value;			
+			if (datatable != "" &amp;&amp; datatable != lastChanges[DATA_TABLE_KEY]) {
+				params = replaceFirstBlankInWith(DATATABLE_TYPE_STR_ETC,params, datatable,REPOSITORY_SEP);
+			}
+			lastChanges[DATA_TABLE_KEY] = datatable;
+
+			var localFile = document.getElementsByName('_.autoLocalFile')[stepIndex].value;
+			if (localFile != "" &amp;&amp; localFile != lastChanges[LOCAL_FILE_KEY]) {
+				localFile = removeTopQualifierFromFilePathName(localFile);
+				if (localFile != "")
+					params = replaceFirstBlankLocalFileInWith(params, localFile);
+			}
+			lastChanges[LOCAL_FILE_KEY] = localFile;
+			
+			if (params != origParams) 
+				document.getElementsByName("_.scriptParams")[stepIndex].value = params;
+			
+			mapScriptParamsObj2lastChangesAppliedToIt[insertButtonPressed] = lastChanges;
+		} 
+	}
+	
+	//if you pass something like "foo/abc/def.xyz" it will remove the top level and return "abc/def.xyz"
+	function removeTopQualifierFromFilePathName(filePath) {
+		var pos = filePath.indexOf(UNIX_STYLE_FILE_SEP);
+		if (pos &lt; 0)
+			pos = filePath.indexOf(WINDOWS_STYLE_FILE_SEP);
+		if (pos &gt;= 0)
+			filePath = filePath.substring(pos + 1); //these separators are both of length 1
+	 	return filePath;
+	}
+	
+	function dbg(msg) { 
+		//alert(msg);
+	}
+  </script>
+  
+  <!-- this purpose of this has not been identified yet -->
+  <!--      
+  <f:entry title="Build Name" field="name">
+    <f:textbox />
+  </f:entry>
+  -->
+  
+  <!-- this will be used when we allow defining multiple clouds -->
+  <!--
+  <f:entry field="perfectoCloud" title="MobileCloud">
+   	<f:select />
+  </f:entry>
+  -->
+  
+  
+  <f:entry title="Automation script" field="autoScript">
+    <f:textbox />
+  </f:entry>
+  <f:entry>
+      <div>
+      	<j:set var="id" value="${descriptor.getRandomID()}" />
+      	<input type="hidden" name="id" value="${id}" />
+         <input type="button" id="refreshParametersHidden" onClick="refreshParameters(param${id})" value="Refresh parameters" />  
+         <f:entry title="Script parameters" field="scriptParams" >
+			  <f:textarea id="param${id}"/>
+	     </f:entry>	
+	     
+      </div>
+  </f:entry>
+
+ 
+  <f:advanced title="Device and Media parameter value assistance" align="left" >
+  <!-- <f:advanced align="left" > -->
+  
+  	<!-- can't place buttons here -->
+  	
+  
+	<f:entry field="deviceId" title="Device" description="After selecting the device click the button above to copy the device id of the selected device to the clipboard">
+		<input type="button" name="copyIMEI" onClick="copyToClipboard(getImeiOf(this))" value="Copy to clipboard" />
+		<f:select name="deviceSelection"/>
+		 <!-- <l:copyButton  message="text copied" text="${deviceId}"  container="DIV"/> --> <!-- this does not work at the moment - some jenkins tag lib bug -->
+	</f:entry>
+	
+	<f:entry title="Media repository" field="autoMedia">
+  		<f:textbox />
+	</f:entry>
+	
+	<!-- these fields and the button below are not needed at this time NP-15359 -->
+  <!--
+	<f:entry title="Datatable repository assistance" field="autoDatatable">
+  		<f:textbox />
+	</f:entry>
+	
+	<f:entry title="Local file assistance" field="autoLocalFile" >
+  		<f:textbox />
+	</f:entry>
+
+	<f:entry>
+		<input type="button" name="insertValuesButton" onClick="insertValues(this)" value="Insert changes into blank script parameters" />
+	</f:entry>
+  -->
+    
+  </f:advanced>
+  
+  
+</j:jelly>

@@ -1,0 +1,30 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:p="/lib/hudson/project">
+  <!--
+    This jelly script is used for per-project configuration.
+
+    See global.jelly for a general discussion about jelly script.
+  -->
+  
+  <!-- this purpose of this has not been identified yet -->
+  <!--      
+  <f:entry title="Build Name" field="name">
+    <f:textbox />
+  </f:entry>
+  -->
+  
+  <!-- this will be used when we allow defining multiple clouds -->
+  <!--
+  <f:entry field="perfectoCloud" title="MobileCloud">
+   	<f:select />
+  </f:entry>
+  -->
+  
+  	<f:entry title="File to upload" field="file2upload">
+    	<f:textbox />
+  	</f:entry>
+  
+	<f:entry title="Target repository path" field="autoMedia">
+  		<f:textbox />
+	</f:entry>
+ 
+</j:jelly>
