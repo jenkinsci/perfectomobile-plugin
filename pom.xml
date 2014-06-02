@@ -1,38 +1,26 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+
 	<parent>
 		<groupId>org.jenkins-ci.plugins</groupId>
 		<artifactId>plugin</artifactId>
 		<version>1.509.4</version>
 	</parent>
 
-	<artifactId>perfectomobile-jenkins</artifactId>
-	<version>1.3-SNAPSHOT</version>
+	<artifactId>perfectomobile</artifactId>
+	<version>2.20.0.11-SNAPSHOT</version>
 	<packaging>hpi</packaging>
-	<name>Perfecto Mobile Jenkins Plugin</name>
+	<name>Perfecto Mobile Plugin</name>
 	<url>https://wiki.jenkins-ci.org/display/JENKINS/MobileCloud+for+Jenkins+Plugin</url>
-
-	<distributionManagement>
-		<repository>
-			<id>maven.jenkins-ci.org</id>
-			<url>http://maven.jenkins-ci.org/content/repositories/releases/</url>
-		</repository>
-	</distributionManagement>
 
 	<developers>
 		<developer>
-			<id>guymi</id>
-			<name>Guy Michaelis</name>
-			<email>guy@tikalk.com</email>
+			<id>perfectomobile-com</id>
+			<name>perfectomobile</name>
+			<email>jenkins.admin@perfectomobile.com</email>
 		</developer>
 	</developers>
-
-	<scm>
-		<connection>scm:git:git://github.com:jenkinsci/MobileCloud.git</connection>
-		<developerConnection>scm:git:git@github.com:jenkinsci/MobileCloud.git</developerConnection>
-		<url>https://github.com/jenkinsci/MobileCloud.git</url>
-	</scm>
-
+	
 	<!-- get every artifact through repo.jenkins-ci.org, which proxies all the 
 		artifacts that we need -->
 	<repositories>
@@ -49,7 +37,20 @@
 		</pluginRepository>
 	</pluginRepositories>
 
-	<dependencies>
+	<distributionManagement>
+		<repository>
+			<id>maven.jenkins-ci.org</id>
+			<url>http://maven.jenkins-ci.org/content/repositories/releases/</url>
+		</repository>
+	</distributionManagement>
+	
+	<scm>
+		<connection>scm:git:git://github.com:jenkinsci/MobileCloud.git</connection>
+		<developerConnection>scm:git:git@github.com:jenkinsci/MobileCloud.git</developerConnection>
+		<url>https://github.com/jenkinsci/MobileCloud.git</url>
+	</scm>
+
+    <dependencies>		
 		<dependency>
 			<groupId>com.sun.jersey</groupId>
 			<artifactId>jersey-client</artifactId>
@@ -72,11 +73,6 @@
 		</dependency>
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
-			<version>4.3.2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpmime</artifactId>
 			<version>4.3.2</version>
 		</dependency>
@@ -86,6 +82,14 @@
 			<version>4.11</version>
 			<scope>test</scope>
 		</dependency>
+		
+		<!-- the next dep'cy copied from copyartifact and is needed only for the upload artifacts builder -->
+		<!-- it's fine when run on jenkins 1.556 machine -->
+		<dependency>
+			<groupId>org.jenkins-ci.main</groupId>
+			<artifactId>maven-plugin</artifactId>
+			<version>1.509</version>
+			<optional>true</optional>
+		</dependency>		
 	</dependencies>
-
 </project>
