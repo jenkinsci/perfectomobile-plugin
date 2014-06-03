@@ -8,7 +8,7 @@
 	</parent>
 
 	<artifactId>perfectomobile</artifactId>
-	<version>2.20.0.11-SNAPSHOT</version>
+	<version>2.20.0.11</version>
 	<packaging>hpi</packaging>
 	<name>Perfecto Mobile Plugin</name>
 	<url>https://wiki.jenkins-ci.org/display/JENKINS/MobileCloud+for+Jenkins+Plugin</url>
@@ -48,7 +48,8 @@
 		<connection>scm:git:git://github.com:jenkinsci/MobileCloud.git</connection>
 		<developerConnection>scm:git:git@github.com:jenkinsci/MobileCloud.git</developerConnection>
 		<url>https://github.com/jenkinsci/MobileCloud.git</url>
-	</scm>
+	  <tag>perfectomobile-2.20.0.11</tag>
+  </scm>
 
     <dependencies>		
 		<dependency>
